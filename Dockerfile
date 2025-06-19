@@ -10,7 +10,8 @@ RUN apt install -y --no-install-recommends \
     curl jq build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip libicu-dev
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt install -y nodejs
+    apt install -y nodejs && \
+    corepack enable
 
 
 RUN cd /home/docker && mkdir actions-runner && cd actions-runner \
