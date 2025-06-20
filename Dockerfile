@@ -1,6 +1,9 @@
 FROM ubuntu:24.04
 
-ENV RUNNER_VERSION="2.325.0"
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8 \
+    RUNNER_VERSION="2.325.0"
 
 # Prevents installdependencies.sh from prompting the user and blocking the image creation
 ARG DEBIAN_FRONTEND=noninteractive
@@ -11,6 +14,29 @@ RUN apt update -y && apt upgrade -y && apt install -y --no-install-recommends \
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt install -y nodejs && \
     corepack enable
+
+# Install Java Development Kit (JDK) - Android builds often require a specific JDK version
+RUN apt update && apt install -y openjdk-17-jdk
+
+# Install Android SDK
+ENV ANDROID_SDK_ROOT="/opt/android-sdk"
+ENV PATH="$PATH:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools"
+
+RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools \
+    && curl -fSL https://dl.google.com/android/repository/commandlinetools-linux-11076708.zip -o /tmp/cmdline-tools.zip \
+    && unzip /tmp/cmdline-tools.zip -d ${ANDROID_SDK_ROOT}/cmdline-tools \
+    && mv ${ANDROID_SDK_ROOT}/cmdline-tools/cmdline-tools ${ANDROID_SDK_ROOT}/cmdline-tools/latest \
+    && rm /tmp/cmdline-tools.zip
+
+# Accept Android SDK licenses
+RUN yes | ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --licenses
+
+# Install necessary SDK components (adjust versions based on your project's needs)
+RUN ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager \
+    "platforms;android-36" \
+    "build-tools;36.0.0" \
+    "platform-tools" \
+    "cmdline-tools;latest"
 
 RUN useradd -m docker
 
