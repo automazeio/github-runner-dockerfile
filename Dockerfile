@@ -45,6 +45,9 @@ RUN ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager \
 
 RUN useradd -m docker
 
+# Grant ownership of the Android SDK directory to the 'docker' user
+RUN chown -R docker:docker ${ANDROID_SDK_ROOT}
+
 RUN cd /home/docker && mkdir actions-runner && cd actions-runner \
     && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
     && tar xzf ./actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
