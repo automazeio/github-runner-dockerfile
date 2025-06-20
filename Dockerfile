@@ -1,15 +1,20 @@
 FROM ubuntu:24.04
 
-ENV LANG=en_US.UTF-8 \
-    LANGUAGE=en_US:en \
-    LC_ALL=en_US.UTF-8 \
-    RUNNER_VERSION="2.325.0"
+ENV RUNNER_VERSION="2.325.0"
 
 # Prevents installdependencies.sh from prompting the user and blocking the image creation
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update -y && apt upgrade -y && apt install -y --no-install-recommends \
-    curl jq build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip libicu-dev libyaml-dev
+    locales curl jq build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip libicu-dev libyaml-dev
+
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
+     && locale-gen \
+     && update-locale LANG=en_US.UTF-8
+
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt install -y nodejs && \
