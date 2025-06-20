@@ -5,14 +5,15 @@ ENV RUNNER_VERSION="2.325.0"
 # Prevents installdependencies.sh from prompting the user and blocking the image creation
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt update -y && apt upgrade -y && useradd -m docker
-RUN apt install -y --no-install-recommends \
+RUN apt update -y && apt upgrade -y \
+    apt install -y --no-install-recommends \
     curl jq build-essential libssl-dev libffi-dev python3 python3-venv python3-dev python3-pip libicu-dev libyaml-dev
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt install -y nodejs && \
     corepack enable
 
+RUN useradd -m docker
 
 RUN cd /home/docker && mkdir actions-runner && cd actions-runner \
     && curl -O -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
